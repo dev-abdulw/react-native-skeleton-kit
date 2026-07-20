@@ -1,12 +1,12 @@
-import { Text, View, StyleSheet } from 'react-native';
-import { multiply } from 'react-native-skeleton-kit';
-
-const result = multiply(3, 7);
+import { View, StyleSheet } from 'react-native';
+import { Skeleton } from 'react-native-skeleton-kit';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Skeleton width={200} height={20} style={styles.line} />
+      <Skeleton width={160} height={20} style={styles.line} />
+      <Skeleton width={60} height={60} borderRadius={30} />
     </View>
   );
 }
@@ -16,5 +16,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 12,
+  },
+  line: {
+    marginBottom: 4,
   },
 });

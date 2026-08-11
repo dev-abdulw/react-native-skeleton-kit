@@ -12,11 +12,13 @@ import Animated, {
   withRepeat,
   withSequence,
   withTiming,
+  interpolateColor,
   Easing,
 } from 'react-native-reanimated';
 import { SkeletonColors, SkeletonDefaults } from './constants';
 
-export type SkeletonAnimation = 'pulse' | 'shimmer' | 'wave' | 'none';
+export type SkeletonAnimation =
+  'pulse' | 'shimmer' | 'wave' | 'gradient-cycle' | 'none';
 
 export interface SkeletonProps {
   width?: DimensionValue;
@@ -31,6 +33,7 @@ export interface SkeletonProps {
   shimmerWidth?: number;
   waveColor?: string;
   waveWidth?: number;
+  gradientColors?: string[];
   style?: StyleProp<ViewStyle>;
 }
 
@@ -47,9 +50,11 @@ export function Skeleton({
   shimmerWidth = SkeletonDefaults.shimmerWidth,
   waveColor = SkeletonColors.wave,
   waveWidth = SkeletonDefaults.waveWidth,
+  gradientColors = SkeletonColors.gradientCycle,
   style,
 }: SkeletonProps) {
   const opacity = useSharedValue(maxOpacity);
+  const gradientProgress = useSharedValue(0);
 
   useEffect(() => {
     if (animation !== 'pulse') {
@@ -73,9 +78,41 @@ export function Skeleton({
     );
   }, [animation, duration, minOpacity, maxOpacity, opacity]);
 
+  useEffect(() => {
+    if (animation !== 'gradient-cycle' || gradientColors.length < 2) {
+      gradientProgress.value = 0;
+      return;
+    }
+
+    gradientProgress.value = withRepeat(
+      withTiming(gradientColors.length - 1, {
+        duration:
+          (duration ?? SkeletonDefaults.gradientCycleDuration) *
+          (gradientColors.length - 1),
+        easing: Easing.inOut(Easing.ease),
+      }),
+      -1,
+      true
+    );
+  }, [animation, duration, gradientColors, gradientProgress]);
+
   const pulseStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
   }));
+
+  const gradientStyle = useAnimatedStyle(() => {
+    if (animation !== 'gradient-cycle' || gradientColors.length < 2) {
+      return {};
+    }
+
+    return {
+      backgroundColor: interpolateColor(
+        gradientProgress.value,
+        gradientColors.map((_, index) => index),
+        gradientColors
+      ),
+    };
+  });
 
   return (
     <Animated.View
@@ -88,6 +125,7 @@ export function Skeleton({
           overflow: 'hidden',
         },
         pulseStyle,
+        gradientStyle,
         style,
       ]}
     >

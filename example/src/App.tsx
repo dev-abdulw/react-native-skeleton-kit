@@ -60,6 +60,28 @@ export default function App() {
         <Skeleton width={60} height={60} borderRadius={30} animation="wave" />
       </View>
 
+      <Text style={styles.heading}>Gradient Cycle</Text>
+      <View style={styles.section}>
+        <Skeleton
+          width={200}
+          height={20}
+          animation="gradient-cycle"
+          style={styles.line}
+        />
+        <Skeleton
+          width={160}
+          height={20}
+          animation="gradient-cycle"
+          style={styles.line}
+        />
+        <Skeleton
+          width={60}
+          height={60}
+          borderRadius={30}
+          animation="gradient-cycle"
+        />
+      </View>
+
       <Text style={styles.heading}>None (static)</Text>
       <View style={styles.section}>
         <Skeleton

@@ -2,7 +2,7 @@
 
 Skeleton loading placeholders for React Native and Expo: shimmer, pulse, wave, gradient-cycle, and spinner-hybrid animations with ready-made shapes.
 
-> **Status:** Phase 1 — the `Skeleton` primitive with `pulse`, `shimmer`, and `wave` animations is available now. Gradient-cycle, spinner-hybrid, a custom-driver escape hatch, and shape presets (text, avatar, card, list item, table, media) are planned next.
+> **Status:** Phase 1 — the `Skeleton` primitive with `pulse`, `shimmer`, `wave`, and `gradient-cycle` animations is available now. Spinner-hybrid, a custom-driver escape hatch, and shape presets (text, avatar, card, list item, table, media) are planned next.
 
 ## Installation
 
@@ -30,14 +30,14 @@ function ProfileLoading() {
 }
 ```
 
-By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out). Pass `animation="shimmer"` for a moving highlight sweep, `animation="wave"` for a softer multi-band sweep, or `animation="none"` for a static placeholder.
+By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out). Pass `animation="shimmer"` for a moving highlight sweep, `animation="wave"` for a softer multi-band sweep, `animation="gradient-cycle"` for a smooth color-cycling background, or `animation="none"` for a static placeholder.
 
 ```tsx
 <Skeleton
   width="100%"
   height={16}
   borderRadius={4}
-  animation="pulse" // "pulse" | "shimmer" | "wave" | "none"
+  animation="pulse" // "pulse" | "shimmer" | "wave" | "gradient-cycle" | "none"
   duration={800} // ms per fade half-cycle
   minOpacity={0.4}
   maxOpacity={1}
@@ -67,6 +67,16 @@ By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out
 />
 ```
 
+```tsx
+<Skeleton
+  width="100%"
+  height={16}
+  animation="gradient-cycle"
+  duration={1500} // ms spent transitioning between each pair of colors
+  gradientColors={['#D3DCE3', '#B8C4CE', '#EDF3F7']}
+/>
+```
+
 ### Props
 
 | Prop              | Type                       | Default    | Description                                   |
@@ -74,8 +84,8 @@ By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out
 | `width`           | `DimensionValue`           | `'100%'`   | Placeholder width.                             |
 | `height`          | `DimensionValue`           | `16`       | Placeholder height.                            |
 | `borderRadius`    | `number`                   | `4`        | Corner radius.                                 |
-| `animation`       | `'pulse' \| 'shimmer' \| 'wave' \| 'none'` | `'pulse'`  | Animation style.                 |
-| `duration`        | `number`                   | `800`/`1200`/`1600` | Duration (ms) of each fade half-cycle (pulse) or full sweep (shimmer/wave). |
+| `animation`       | `'pulse' \| 'shimmer' \| 'wave' \| 'gradient-cycle' \| 'none'` | `'pulse'`  | Animation style. |
+| `duration`        | `number`                   | `800`/`1200`/`1600`/`1500` | Duration (ms) of each fade half-cycle (pulse), full sweep (shimmer/wave), or per-color-pair transition (gradient-cycle). |
 | `minOpacity`      | `number`                   | `0.4`      | Opacity at the dimmest point of the pulse.     |
 | `maxOpacity`      | `number`                   | `1`        | Opacity at the brightest point of the pulse.   |
 | `backgroundColor` | `string`                   | `#E1E9EE`  | Placeholder fill color.                        |
@@ -83,6 +93,7 @@ By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out
 | `shimmerWidth`    | `number`                   | `0.3`      | Shimmer band width as a fraction of the placeholder width. |
 | `waveColor`       | `string`                   | `#F2F8FC`  | Color of the wave sweep bands.                 |
 | `waveWidth`       | `number`                   | `0.5`      | Widest wave band's width as a fraction of the placeholder width. |
+| `gradientColors`  | `string[]`                 | `['#D3DCE3', '#B8C4CE', '#EDF3F7']` | Colors the background cycles through, in order. |
 | `style`           | `StyleProp<ViewStyle>`     | —          | Additional styles, merged last.                |
 
 `SkeletonColors` and `SkeletonDefaults` are also exported if you want to reuse the library's default theme values in your own components.

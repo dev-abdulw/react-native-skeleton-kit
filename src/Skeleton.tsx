@@ -16,7 +16,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { SkeletonColors, SkeletonDefaults } from './constants';
 
-export type SkeletonAnimation = 'pulse' | 'shimmer' | 'none';
+export type SkeletonAnimation = 'pulse' | 'shimmer' | 'wave' | 'none';
 
 export interface SkeletonProps {
   width?: DimensionValue;
@@ -29,6 +29,8 @@ export interface SkeletonProps {
   backgroundColor?: string;
   shimmerColor?: string;
   shimmerWidth?: number;
+  waveColor?: string;
+  waveWidth?: number;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -43,6 +45,8 @@ export function Skeleton({
   backgroundColor = SkeletonColors.base,
   shimmerColor = SkeletonColors.shimmer,
   shimmerWidth = SkeletonDefaults.shimmerWidth,
+  waveColor = SkeletonColors.wave,
+  waveWidth = SkeletonDefaults.waveWidth,
   style,
 }: SkeletonProps) {
   const opacity = useSharedValue(maxOpacity);
@@ -88,24 +92,60 @@ export function Skeleton({
       ]}
     >
       {animation === 'shimmer' && (
-        <ShimmerOverlay
+        <SweepOverlay
           duration={duration ?? SkeletonDefaults.shimmerDuration}
-          shimmerColor={shimmerColor}
-          shimmerWidth={shimmerWidth}
+          bands={[
+            {
+              color: shimmerColor,
+              opacity: 0.5,
+              widthFraction: shimmerWidth,
+              offsetFraction: 0,
+            },
+          ]}
+        />
+      )}
+      {animation === 'wave' && (
+        <SweepOverlay
+          duration={duration ?? SkeletonDefaults.waveDuration}
+          bands={[
+            {
+              color: waveColor,
+              opacity: 0.15,
+              widthFraction: waveWidth,
+              offsetFraction: 0,
+            },
+            {
+              color: waveColor,
+              opacity: 0.3,
+              widthFraction: waveWidth * 0.5,
+              offsetFraction: waveWidth * 0.25,
+            },
+            {
+              color: waveColor,
+              opacity: 0.15,
+              widthFraction: waveWidth,
+              offsetFraction: waveWidth * 0.5,
+            },
+          ]}
         />
       )}
     </Animated.View>
   );
 }
 
-function ShimmerOverlay({
+interface SweepBand {
+  color: string;
+  opacity: number;
+  widthFraction: number;
+  offsetFraction: number;
+}
+
+function SweepOverlay({
   duration,
-  shimmerColor,
-  shimmerWidth,
+  bands,
 }: {
   duration: number;
-  shimmerColor: string;
-  shimmerWidth: number;
+  bands: SweepBand[];
 }) {
   const [layoutWidth, setLayoutWidth] = useState(0);
   const translateX = useSharedValue(0);
@@ -114,14 +154,15 @@ function ShimmerOverlay({
     setLayoutWidth(event.nativeEvent.layout.width);
   };
 
-  const bandWidth = layoutWidth * shimmerWidth;
+  const maxBandWidth =
+    layoutWidth * Math.max(...bands.map((band) => band.widthFraction));
 
   useEffect(() => {
     if (layoutWidth === 0) {
       return;
     }
 
-    translateX.value = -bandWidth;
+    translateX.value = -maxBandWidth;
     translateX.value = withRepeat(
       withTiming(layoutWidth, {
         duration,
@@ -130,7 +171,7 @@ function ShimmerOverlay({
       -1,
       false
     );
-  }, [duration, layoutWidth, bandWidth, translateX]);
+  }, [duration, layoutWidth, maxBandWidth, translateX]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
@@ -143,17 +184,22 @@ function ShimmerOverlay({
       pointerEvents="none"
     >
       {layoutWidth > 0 && (
-        <Animated.View
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              width: bandWidth,
-              backgroundColor: shimmerColor,
-              opacity: 0.5,
-            },
-            animatedStyle,
-          ]}
-        />
+        <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
+          {bands.map((band, index) => (
+            <Animated.View
+              key={index}
+              style={[
+                StyleSheet.absoluteFill,
+                {
+                  left: layoutWidth * band.offsetFraction,
+                  width: layoutWidth * band.widthFraction,
+                  backgroundColor: band.color,
+                  opacity: band.opacity,
+                },
+              ]}
+            />
+          ))}
+        </Animated.View>
       )}
     </Animated.View>
   );

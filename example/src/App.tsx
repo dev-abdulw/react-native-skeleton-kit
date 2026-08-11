@@ -43,6 +43,23 @@ export default function App() {
         />
       </View>
 
+      <Text style={styles.heading}>Wave</Text>
+      <View style={styles.section}>
+        <Skeleton
+          width={200}
+          height={20}
+          animation="wave"
+          style={styles.line}
+        />
+        <Skeleton
+          width={160}
+          height={20}
+          animation="wave"
+          style={styles.line}
+        />
+        <Skeleton width={60} height={60} borderRadius={30} animation="wave" />
+      </View>
+
       <Text style={styles.heading}>None (static)</Text>
       <View style={styles.section}>
         <Skeleton

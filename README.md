@@ -2,7 +2,7 @@
 
 Skeleton loading placeholders for React Native and Expo: shimmer, pulse, wave, gradient-cycle, and spinner-hybrid animations with ready-made shapes.
 
-> **Status:** Phase 1 — the `Skeleton` primitive with `pulse` animation is available now. Shimmer, wave, gradient-cycle, spinner-hybrid, a custom-driver escape hatch, and shape presets (text, avatar, card, list item, table, media) are planned next.
+> **Status:** Phase 1 — the `Skeleton` primitive with `pulse` and `shimmer` animations is available now. Wave, gradient-cycle, spinner-hybrid, a custom-driver escape hatch, and shape presets (text, avatar, card, list item, table, media) are planned next.
 
 ## Installation
 
@@ -30,18 +30,29 @@ function ProfileLoading() {
 }
 ```
 
-By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out). Pass `animation="none"` for a static placeholder.
+By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out). Pass `animation="shimmer"` for a moving highlight sweep, or `animation="none"` for a static placeholder.
 
 ```tsx
 <Skeleton
   width="100%"
   height={16}
   borderRadius={4}
-  animation="pulse" // "pulse" | "none"
+  animation="pulse" // "pulse" | "shimmer" | "none"
   duration={800} // ms per fade half-cycle
   minOpacity={0.4}
   maxOpacity={1}
   backgroundColor="#E1E9EE"
+/>
+```
+
+```tsx
+<Skeleton
+  width="100%"
+  height={16}
+  animation="shimmer"
+  duration={1200} // ms per sweep across the placeholder
+  shimmerColor="#F2F8FC"
+  shimmerWidth={0.3} // sweep band width as a fraction of the placeholder width
 />
 ```
 
@@ -52,11 +63,13 @@ By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out
 | `width`           | `DimensionValue`           | `'100%'`   | Placeholder width.                             |
 | `height`          | `DimensionValue`           | `16`       | Placeholder height.                            |
 | `borderRadius`    | `number`                   | `4`        | Corner radius.                                 |
-| `animation`       | `'pulse' \| 'none'`        | `'pulse'`  | Animation style.                               |
-| `duration`        | `number`                   | `800`      | Duration (ms) of each fade half-cycle.         |
+| `animation`       | `'pulse' \| 'shimmer' \| 'none'` | `'pulse'`  | Animation style.                         |
+| `duration`        | `number`                   | `800`/`1200` | Duration (ms) of each fade half-cycle (pulse) or full sweep (shimmer). |
 | `minOpacity`      | `number`                   | `0.4`      | Opacity at the dimmest point of the pulse.     |
 | `maxOpacity`      | `number`                   | `1`        | Opacity at the brightest point of the pulse.   |
 | `backgroundColor` | `string`                   | `#E1E9EE`  | Placeholder fill color.                        |
+| `shimmerColor`    | `string`                   | `#F2F8FC`  | Color of the shimmer sweep band.               |
+| `shimmerWidth`    | `number`                   | `0.3`      | Shimmer band width as a fraction of the placeholder width. |
 | `style`           | `StyleProp<ViewStyle>`     | —          | Additional styles, merged last.                |
 
 `SkeletonColors` and `SkeletonDefaults` are also exported if you want to reuse the library's default theme values in your own components.

@@ -82,6 +82,22 @@ export default function App() {
         />
       </View>
 
+      <Text style={styles.heading}>Spinner Hybrid</Text>
+      <View style={styles.section}>
+        <Skeleton
+          width={120}
+          height={120}
+          borderRadius={12}
+          animation="spinner-hybrid"
+        />
+        <Skeleton
+          width={60}
+          height={60}
+          borderRadius={30}
+          animation="spinner-hybrid"
+        />
+      </View>
+
       <Text style={styles.heading}>None (static)</Text>
       <View style={styles.section}>
         <Skeleton

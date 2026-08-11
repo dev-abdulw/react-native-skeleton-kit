@@ -2,7 +2,7 @@
 
 Skeleton loading placeholders for React Native and Expo: shimmer, pulse, wave, gradient-cycle, and spinner-hybrid animations with ready-made shapes.
 
-> **Status:** Phase 1 — the `Skeleton` primitive with `pulse`, `shimmer`, `wave`, and `gradient-cycle` animations is available now. Spinner-hybrid, a custom-driver escape hatch, and shape presets (text, avatar, card, list item, table, media) are planned next.
+> **Status:** Phase 1 — the `Skeleton` primitive with `pulse`, `shimmer`, `wave`, `gradient-cycle`, and `spinner-hybrid` animations is available now. A custom-driver escape hatch and shape presets (text, avatar, card, list item, table, media) are planned next.
 
 ## Installation
 
@@ -30,14 +30,14 @@ function ProfileLoading() {
 }
 ```
 
-By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out). Pass `animation="shimmer"` for a moving highlight sweep, `animation="wave"` for a softer multi-band sweep, `animation="gradient-cycle"` for a smooth color-cycling background, or `animation="none"` for a static placeholder.
+By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out). Pass `animation="shimmer"` for a moving highlight sweep, `animation="wave"` for a softer multi-band sweep, `animation="gradient-cycle"` for a smooth color-cycling background, `animation="spinner-hybrid"` for a pulsing placeholder with a small spinner centered on top, or `animation="none"` for a static placeholder.
 
 ```tsx
 <Skeleton
   width="100%"
   height={16}
   borderRadius={4}
-  animation="pulse" // "pulse" | "shimmer" | "wave" | "gradient-cycle" | "none"
+  animation="pulse" // "pulse" | "shimmer" | "wave" | "gradient-cycle" | "spinner-hybrid" | "none"
   duration={800} // ms per fade half-cycle
   minOpacity={0.4}
   maxOpacity={1}
@@ -77,24 +77,40 @@ By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out
 />
 ```
 
+```tsx
+<Skeleton
+  width={120}
+  height={120}
+  borderRadius={12}
+  animation="spinner-hybrid"
+  duration={900} // ms per full spinner rotation
+  spinnerColor="#9FB3C2"
+  spinnerSize={0.4} // spinner diameter as a fraction of min(width, height), capped at 32px
+  spinnerStrokeWidth={2}
+/>
+```
+
 ### Props
 
-| Prop              | Type                       | Default    | Description                                   |
-| ----------------- | -------------------------- | ---------- | ---------------------------------------------- |
-| `width`           | `DimensionValue`           | `'100%'`   | Placeholder width.                             |
-| `height`          | `DimensionValue`           | `16`       | Placeholder height.                            |
-| `borderRadius`    | `number`                   | `4`        | Corner radius.                                 |
-| `animation`       | `'pulse' \| 'shimmer' \| 'wave' \| 'gradient-cycle' \| 'none'` | `'pulse'`  | Animation style. |
-| `duration`        | `number`                   | `800`/`1200`/`1600`/`1500` | Duration (ms) of each fade half-cycle (pulse), full sweep (shimmer/wave), or per-color-pair transition (gradient-cycle). |
-| `minOpacity`      | `number`                   | `0.4`      | Opacity at the dimmest point of the pulse.     |
-| `maxOpacity`      | `number`                   | `1`        | Opacity at the brightest point of the pulse.   |
-| `backgroundColor` | `string`                   | `#E1E9EE`  | Placeholder fill color.                        |
-| `shimmerColor`    | `string`                   | `#F2F8FC`  | Color of the shimmer sweep band.               |
-| `shimmerWidth`    | `number`                   | `0.3`      | Shimmer band width as a fraction of the placeholder width. |
-| `waveColor`       | `string`                   | `#F2F8FC`  | Color of the wave sweep bands.                 |
-| `waveWidth`       | `number`                   | `0.5`      | Widest wave band's width as a fraction of the placeholder width. |
-| `gradientColors`  | `string[]`                 | `['#D3DCE3', '#B8C4CE', '#EDF3F7']` | Colors the background cycles through, in order. |
-| `style`           | `StyleProp<ViewStyle>`     | —          | Additional styles, merged last.                |
+| Prop                  | Type                       | Default    | Description                                   |
+| --------------------- | -------------------------- | ---------- | ---------------------------------------------- |
+| `width`               | `DimensionValue`           | `'100%'`   | Placeholder width.                             |
+| `height`              | `DimensionValue`           | `16`       | Placeholder height.                            |
+| `borderRadius`        | `number`                   | `4`        | Corner radius.                                 |
+| `animation`           | `'pulse' \| 'shimmer' \| 'wave' \| 'gradient-cycle' \| 'spinner-hybrid' \| 'none'` | `'pulse'`  | Animation style. |
+| `duration`            | `number`                   | `800`/`1200`/`1600`/`1500`/`900` | Duration (ms) of each fade half-cycle (pulse/spinner-hybrid), full sweep (shimmer/wave), per-color-pair transition (gradient-cycle), or full rotation (spinner-hybrid's spinner). |
+| `minOpacity`          | `number`                   | `0.4`      | Opacity at the dimmest point of the pulse.     |
+| `maxOpacity`          | `number`                   | `1`        | Opacity at the brightest point of the pulse.   |
+| `backgroundColor`     | `string`                   | `#E1E9EE`  | Placeholder fill color.                        |
+| `shimmerColor`        | `string`                   | `#F2F8FC`  | Color of the shimmer sweep band.               |
+| `shimmerWidth`        | `number`                   | `0.3`      | Shimmer band width as a fraction of the placeholder width. |
+| `waveColor`           | `string`                   | `#F2F8FC`  | Color of the wave sweep bands.                 |
+| `waveWidth`           | `number`                   | `0.5`      | Widest wave band's width as a fraction of the placeholder width. |
+| `gradientColors`      | `string[]`                 | `['#D3DCE3', '#B8C4CE', '#EDF3F7']` | Colors the background cycles through, in order. |
+| `spinnerColor`        | `string`                   | `#9FB3C2`  | Color of the spinner-hybrid ring.              |
+| `spinnerSize`         | `number`                   | `0.4`      | Spinner diameter as a fraction of `min(width, height)`, capped at 32px. |
+| `spinnerStrokeWidth`  | `number`                   | `2`        | Stroke width of the spinner ring.              |
+| `style`               | `StyleProp<ViewStyle>`     | —          | Additional styles, merged last.                |
 
 `SkeletonColors` and `SkeletonDefaults` are also exported if you want to reuse the library's default theme values in your own components.
 

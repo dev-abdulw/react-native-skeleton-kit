@@ -18,7 +18,7 @@ import Animated, {
 import { SkeletonColors, SkeletonDefaults } from './constants';
 
 export type SkeletonAnimation =
-  'pulse' | 'shimmer' | 'wave' | 'gradient-cycle' | 'none';
+  'pulse' | 'shimmer' | 'wave' | 'gradient-cycle' | 'spinner-hybrid' | 'none';
 
 export interface SkeletonProps {
   width?: DimensionValue;
@@ -34,6 +34,9 @@ export interface SkeletonProps {
   waveColor?: string;
   waveWidth?: number;
   gradientColors?: string[];
+  spinnerColor?: string;
+  spinnerSize?: number;
+  spinnerStrokeWidth?: number;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -51,13 +54,16 @@ export function Skeleton({
   waveColor = SkeletonColors.wave,
   waveWidth = SkeletonDefaults.waveWidth,
   gradientColors = SkeletonColors.gradientCycle,
+  spinnerColor = SkeletonColors.spinner,
+  spinnerSize = SkeletonDefaults.spinnerSize,
+  spinnerStrokeWidth = SkeletonDefaults.spinnerStrokeWidth,
   style,
 }: SkeletonProps) {
   const opacity = useSharedValue(maxOpacity);
   const gradientProgress = useSharedValue(0);
 
   useEffect(() => {
-    if (animation !== 'pulse') {
+    if (animation !== 'pulse' && animation !== 'spinner-hybrid') {
       opacity.value = maxOpacity;
       return;
     }
@@ -167,6 +173,14 @@ export function Skeleton({
           ]}
         />
       )}
+      {animation === 'spinner-hybrid' && (
+        <SpinnerOverlay
+          duration={duration ?? SkeletonDefaults.spinnerDuration}
+          color={spinnerColor}
+          sizeFraction={spinnerSize}
+          strokeWidth={spinnerStrokeWidth}
+        />
+      )}
     </Animated.View>
   );
 }
@@ -242,3 +256,78 @@ function SweepOverlay({
     </Animated.View>
   );
 }
+
+function SpinnerOverlay({
+  duration,
+  color,
+  sizeFraction,
+  strokeWidth,
+}: {
+  duration: number;
+  color: string;
+  sizeFraction: number;
+  strokeWidth: number;
+}) {
+  const [layoutSize, setLayoutSize] = useState({ width: 0, height: 0 });
+  const rotation = useSharedValue(0);
+
+  const onLayout = (event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    setLayoutSize({ width, height });
+  };
+
+  const spinnerDiameter = Math.min(
+    Math.min(layoutSize.width, layoutSize.height) * sizeFraction,
+    SkeletonDefaults.spinnerMaxSize
+  );
+
+  useEffect(() => {
+    if (spinnerDiameter === 0) {
+      return;
+    }
+
+    rotation.value = withRepeat(
+      withTiming(360, {
+        duration,
+        easing: Easing.linear,
+      }),
+      -1,
+      false
+    );
+  }, [duration, spinnerDiameter, rotation]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
+
+  return (
+    <Animated.View
+      style={[StyleSheet.absoluteFill, styles.spinnerContainer]}
+      onLayout={onLayout}
+      pointerEvents="none"
+    >
+      {spinnerDiameter > 0 && (
+        <Animated.View
+          style={[
+            {
+              width: spinnerDiameter,
+              height: spinnerDiameter,
+              borderRadius: spinnerDiameter / 2,
+              borderWidth: strokeWidth,
+              borderColor: 'transparent',
+              borderTopColor: color,
+            },
+            animatedStyle,
+          ]}
+        />
+      )}
+    </Animated.View>
+  );
+}
+
+const styles = StyleSheet.create({
+  spinnerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

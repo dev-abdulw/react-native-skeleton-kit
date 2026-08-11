@@ -3,6 +3,7 @@ export const SkeletonColors = {
   shimmer: '#F2F8FC',
   wave: '#F2F8FC',
   gradientCycle: ['#D3DCE3', '#B8C4CE', '#EDF3F7'] as string[],
+  spinner: '#9FB3C2',
 } as const;
 
 export const SkeletonDefaults = {
@@ -17,4 +18,8 @@ export const SkeletonDefaults = {
   waveDuration: 1600,
   waveWidth: 0.5,
   gradientCycleDuration: 1500,
+  spinnerDuration: 900,
+  spinnerSize: 0.4,
+  spinnerMaxSize: 32,
+  spinnerStrokeWidth: 2,
 } as const;

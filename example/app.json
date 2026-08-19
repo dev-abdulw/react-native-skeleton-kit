@@ -23,9 +23,6 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "package": "skeletonkit.example"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
     }
   }
 }

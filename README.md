@@ -4,15 +4,43 @@ Skeleton loading placeholders for React Native and Expo: shimmer, pulse, wave, g
 
 > **Status:** Phase 1 — the `Skeleton` primitive with `pulse`, `shimmer`, `wave`, `gradient-cycle`, and `spinner-hybrid` animations, plus a custom-driver escape hatch, is available now. Shape presets (text, avatar, card, list item, table, media) are planned next.
 
+## Requirements
+
+- **React Native's New Architecture (Fabric)** — required by `react-native-reanimated` v4. RN ≥ 0.76 with the New Architecture enabled (the default since RN 0.76).
+- **React Native 0.83–0.86** if you install the latest `react-native-reanimated` (currently 4.5.x). Older RN versions can still work if you pin an earlier `react-native-reanimated` 4.x release instead — check [Reanimated's own peer dependency range](https://www.npmjs.com/package/react-native-reanimated?activeTab=code) for the version you install.
+- **A custom dev client, not Expo Go**, if you're on Expo. Reanimated v4 and `react-native-worklets` need native code that plain Expo Go doesn't include — use `npx expo run:ios` / `npx expo run:android`, or an EAS development build.
+
 ## Installation
 
-This library uses [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) (v4) to drive animations, so it and its `react-native-worklets` peer must be installed alongside it:
+This library uses [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) (v4) to drive animations, so it and its `react-native-worklets` peer must be installed alongside it.
+
+**Expo projects:**
+
+```sh
+npx expo install react-native-skeleton-kit react-native-reanimated react-native-worklets
+```
+
+`expo install` (rather than `npm`/`yarn install`) resolves versions that match your installed Expo SDK.
+
+**Bare React Native projects:**
 
 ```sh
 npm install react-native-skeleton-kit react-native-reanimated react-native-worklets
 ```
 
-Then follow the [Reanimated installation guide](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started) for your project (bare React Native or Expo) to finish setting up the Babel plugin/worklets config.
+Then follow the [Reanimated installation guide](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started) for your project to finish setup. In short, both paths need the Reanimated Babel plugin added to `babel.config.js`:
+
+```js
+// babel.config.js
+module.exports = {
+  presets: ['babel-preset-expo'], // or 'module:@react-native/babel-preset' for bare RN
+  plugins: [
+    'react-native-worklets/plugin', // must be listed last
+  ],
+};
+```
+
+After editing `babel.config.js`, clear the Metro cache (`npx expo start -c` or `yarn start --reset-cache`) and, for bare RN/Expo dev-client apps, rebuild the native app (`npx expo run:ios` / `npx expo run:android`) since Reanimated ships native code.
 
 ## Usage
 

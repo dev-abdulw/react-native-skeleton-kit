@@ -11,6 +11,28 @@ This project is a monorepo managed using [Yarn workspaces](https://yarnpkg.com/f
 - The library package in the root directory.
 - An example app in the `example/` directory.
 
+### Project structure
+
+The library source lives in `src/`:
+
+```
+src/
+  Skeleton.tsx        # the public component — wires props to each animation
+  types.ts            # SkeletonProps, SkeletonAnimation, SkeletonCustomDriver
+  constants.ts         # default colors and timings (SkeletonColors, SkeletonDefaults)
+  index.tsx            # public exports
+  animations/
+    pulse.ts            # opacity-fade hook, used by "pulse" and "spinner-hybrid"
+    shimmer.tsx          # single-band sweep overlay
+    wave.tsx             # multi-band sweep overlay
+    gradientCycle.ts      # background color-cycling hook
+    custom.ts             # drives the animation="custom" escape hatch
+    spinnerHybrid.tsx      # rotating ring overlay
+    sweepOverlay.tsx       # shared sweep-band rendering used by shimmer/wave
+```
+
+Each animation owns its own file under `animations/` — a hook (`.ts`) if it only needs to return a style, or a component (`.tsx`) if it renders its own overlay. `Skeleton.tsx` itself should stay a thin orchestrator: it reads props, calls each animation's hook, and conditionally renders each animation's overlay component. See [Adding a new animation](#adding-a-new-animation) below.
+
 To get started with the project, make sure you have the correct version of [Node.js](https://nodejs.org/) installed. See the [`.nvmrc`](./.nvmrc) file for the version used in this project.
 
 Run `yarn` in the root directory to install the required dependencies for each package:
@@ -52,12 +74,6 @@ Running "SkeletonKitExample" with {"fabric":true,"initialProps":{"concurrentRoot
 ```
 
 Note the `"fabric":true` and `"concurrentRoot":true` properties.
-
-To run the example app on Web:
-
-```sh
-yarn example web
-```
 
 Make sure your code passes TypeScript:
 
@@ -102,14 +118,20 @@ The `package.json` file contains various scripts for common tasks:
 
 - `yarn`: setup project by installing dependencies.
 - `yarn typecheck`: type-check files with TypeScript.
-  - `yarn lint`: lint files with [ESLint](https://eslint.org/).
-    - `yarn test`: run unit tests with [Jest](https://jestjs.io/).
-  - `yarn example start`: start the Metro server for the example app.
+- `yarn lint`: lint files with [ESLint](https://eslint.org/).
+- `yarn test`: run unit tests with [Jest](https://jestjs.io/).
+- `yarn example start`: start the Metro server for the example app.
 - `yarn example android`: run the example app on Android.
 - `yarn example ios`: run the example app on iOS.
-  - `yarn example web`: run the example app on Web.
-- `yarn example build:web`: build the example app for Web.
-  
+
+### Adding a new animation
+
+1. Add the new name to the `SkeletonAnimation` union in `src/types.ts`, plus any new props it needs on `SkeletonProps` (color/size overrides, etc.).
+2. Add its default color(s)/timing to `SkeletonColors`/`SkeletonDefaults` in `src/constants.ts`.
+3. Create `src/animations/<name>.ts` (or `.tsx` if it renders an overlay) exporting either a hook that returns an animated style, or an overlay component — follow the pattern in an existing file like `src/animations/pulse.ts` or `src/animations/shimmer.tsx`.
+4. Wire it into `src/Skeleton.tsx`: call the hook (if any) and add the conditional overlay render (if any). Keep `Skeleton.tsx` itself free of animation-specific logic.
+5. Add a section for it to `example/src/App.tsx` so it's visible in the example app, and document the new props in the README's Props table.
+
 ### Sending a pull request
 
 > **Working on your first pull request?** You can learn how from this _free_ series: [How to Contribute to an Open Source Project on GitHub](https://app.egghead.io/playlists/how-to-contribute-to-an-open-source-project-on-github).

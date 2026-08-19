@@ -1,5 +1,18 @@
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
-import { Skeleton } from 'react-native-skeleton-kit';
+import { interpolate, interpolateColor } from 'react-native-reanimated';
+import { Skeleton, type SkeletonCustomDriver } from 'react-native-skeleton-kit';
+
+const scaleBreathDriver: SkeletonCustomDriver = (progress) => {
+  'worklet';
+  return {
+    transform: [{ scale: interpolate(progress.value, [0, 1], [0.94, 1]) }],
+    backgroundColor: interpolateColor(
+      progress.value,
+      [0, 1],
+      ['#E1E9EE', '#B8C4CE']
+    ),
+  };
+};
 
 export default function App() {
   return (
@@ -95,6 +108,24 @@ export default function App() {
           height={60}
           borderRadius={30}
           animation="spinner-hybrid"
+        />
+      </View>
+
+      <Text style={styles.heading}>Custom Driver</Text>
+      <View style={styles.section}>
+        <Skeleton
+          width={200}
+          height={20}
+          animation="custom"
+          customDriver={scaleBreathDriver}
+          style={styles.line}
+        />
+        <Skeleton
+          width={60}
+          height={60}
+          borderRadius={30}
+          animation="custom"
+          customDriver={scaleBreathDriver}
         />
       </View>
 

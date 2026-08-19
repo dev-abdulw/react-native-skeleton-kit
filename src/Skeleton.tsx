@@ -14,11 +14,20 @@ import Animated, {
   withTiming,
   interpolateColor,
   Easing,
+  type SharedValue,
 } from 'react-native-reanimated';
 import { SkeletonColors, SkeletonDefaults } from './constants';
 
 export type SkeletonAnimation =
-  'pulse' | 'shimmer' | 'wave' | 'gradient-cycle' | 'spinner-hybrid' | 'none';
+  | 'pulse'
+  | 'shimmer'
+  | 'wave'
+  | 'gradient-cycle'
+  | 'spinner-hybrid'
+  | 'custom'
+  | 'none';
+
+export type SkeletonCustomDriver = (progress: SharedValue<number>) => ViewStyle;
 
 export interface SkeletonProps {
   width?: DimensionValue;
@@ -37,6 +46,7 @@ export interface SkeletonProps {
   spinnerColor?: string;
   spinnerSize?: number;
   spinnerStrokeWidth?: number;
+  customDriver?: SkeletonCustomDriver;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -57,10 +67,12 @@ export function Skeleton({
   spinnerColor = SkeletonColors.spinner,
   spinnerSize = SkeletonDefaults.spinnerSize,
   spinnerStrokeWidth = SkeletonDefaults.spinnerStrokeWidth,
+  customDriver,
   style,
 }: SkeletonProps) {
   const opacity = useSharedValue(maxOpacity);
   const gradientProgress = useSharedValue(0);
+  const customProgress = useSharedValue(0);
 
   useEffect(() => {
     if (animation !== 'pulse' && animation !== 'spinner-hybrid') {
@@ -102,6 +114,22 @@ export function Skeleton({
     );
   }, [animation, duration, gradientColors, gradientProgress]);
 
+  useEffect(() => {
+    if (animation !== 'custom' || !customDriver) {
+      customProgress.value = 0;
+      return;
+    }
+
+    customProgress.value = withRepeat(
+      withTiming(1, {
+        duration: duration ?? SkeletonDefaults.duration,
+        easing: Easing.inOut(Easing.ease),
+      }),
+      -1,
+      true
+    );
+  }, [animation, duration, customDriver, customProgress]);
+
   const pulseStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
   }));
@@ -120,6 +148,14 @@ export function Skeleton({
     };
   });
 
+  const customStyle = useAnimatedStyle(() => {
+    if (animation !== 'custom' || !customDriver) {
+      return {};
+    }
+
+    return customDriver(customProgress);
+  });
+
   return (
     <Animated.View
       style={[
@@ -132,6 +168,7 @@ export function Skeleton({
         },
         pulseStyle,
         gradientStyle,
+        customStyle,
         style,
       ]}
     >

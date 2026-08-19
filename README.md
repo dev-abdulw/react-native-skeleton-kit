@@ -2,7 +2,7 @@
 
 Skeleton loading placeholders for React Native and Expo: shimmer, pulse, wave, gradient-cycle, and spinner-hybrid animations with ready-made shapes.
 
-> **Status:** Phase 1 — the `Skeleton` primitive with `pulse`, `shimmer`, `wave`, `gradient-cycle`, and `spinner-hybrid` animations is available now. A custom-driver escape hatch and shape presets (text, avatar, card, list item, table, media) are planned next.
+> **Status:** Phase 1 — the `Skeleton` primitive with `pulse`, `shimmer`, `wave`, `gradient-cycle`, and `spinner-hybrid` animations, plus a custom-driver escape hatch, is available now. Shape presets (text, avatar, card, list item, table, media) are planned next.
 
 ## Installation
 
@@ -30,14 +30,14 @@ function ProfileLoading() {
 }
 ```
 
-By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out). Pass `animation="shimmer"` for a moving highlight sweep, `animation="wave"` for a softer multi-band sweep, `animation="gradient-cycle"` for a smooth color-cycling background, `animation="spinner-hybrid"` for a pulsing placeholder with a small spinner centered on top, or `animation="none"` for a static placeholder.
+By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out). Pass `animation="shimmer"` for a moving highlight sweep, `animation="wave"` for a softer multi-band sweep, `animation="gradient-cycle"` for a smooth color-cycling background, `animation="spinner-hybrid"` for a pulsing placeholder with a small spinner centered on top, `animation="custom"` to drive the style yourself, or `animation="none"` for a static placeholder.
 
 ```tsx
 <Skeleton
   width="100%"
   height={16}
   borderRadius={4}
-  animation="pulse" // "pulse" | "shimmer" | "wave" | "gradient-cycle" | "spinner-hybrid" | "none"
+  animation="pulse" // "pulse" | "shimmer" | "wave" | "gradient-cycle" | "spinner-hybrid" | "custom" | "none"
   duration={800} // ms per fade half-cycle
   minOpacity={0.4}
   maxOpacity={1}
@@ -90,6 +90,33 @@ By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out
 />
 ```
 
+If none of the built-in animations fit, pass `animation="custom"` with a `customDriver` function. It receives a Reanimated `SharedValue<number>` that loops `0 → 1 → 0` (paced by `duration`) and must return a `ViewStyle` object. **It must start with a `'worklet'` directive** so Reanimated's Babel plugin compiles it to run on the UI thread — without it you'll hit a `[Worklets] Tried to synchronously call a Remote Function` error at runtime.
+
+```tsx
+import { interpolate, interpolateColor } from 'react-native-reanimated';
+import { Skeleton, type SkeletonCustomDriver } from 'react-native-skeleton-kit';
+
+const scaleBreathDriver: SkeletonCustomDriver = (progress) => {
+  'worklet';
+  return {
+    transform: [{ scale: interpolate(progress.value, [0, 1], [0.94, 1]) }],
+    backgroundColor: interpolateColor(
+      progress.value,
+      [0, 1],
+      ['#E1E9EE', '#B8C4CE']
+    ),
+  };
+};
+
+<Skeleton
+  width="100%"
+  height={16}
+  animation="custom"
+  customDriver={scaleBreathDriver}
+  duration={800} // ms per 0→1 half-cycle, same pacing as pulse
+/>
+```
+
 ### Props
 
 | Prop                  | Type                       | Default    | Description                                   |
@@ -97,8 +124,8 @@ By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out
 | `width`               | `DimensionValue`           | `'100%'`   | Placeholder width.                             |
 | `height`              | `DimensionValue`           | `16`       | Placeholder height.                            |
 | `borderRadius`        | `number`                   | `4`        | Corner radius.                                 |
-| `animation`           | `'pulse' \| 'shimmer' \| 'wave' \| 'gradient-cycle' \| 'spinner-hybrid' \| 'none'` | `'pulse'`  | Animation style. |
-| `duration`            | `number`                   | `800`/`1200`/`1600`/`1500`/`900` | Duration (ms) of each fade half-cycle (pulse/spinner-hybrid), full sweep (shimmer/wave), per-color-pair transition (gradient-cycle), or full rotation (spinner-hybrid's spinner). |
+| `animation`           | `'pulse' \| 'shimmer' \| 'wave' \| 'gradient-cycle' \| 'spinner-hybrid' \| 'custom' \| 'none'` | `'pulse'`  | Animation style. |
+| `duration`            | `number`                   | `800`/`1200`/`1600`/`1500`/`900`/`800` | Duration (ms) of each fade half-cycle (pulse/spinner-hybrid/custom), full sweep (shimmer/wave), per-color-pair transition (gradient-cycle), or full rotation (spinner-hybrid's spinner). |
 | `minOpacity`          | `number`                   | `0.4`      | Opacity at the dimmest point of the pulse.     |
 | `maxOpacity`          | `number`                   | `1`        | Opacity at the brightest point of the pulse.   |
 | `backgroundColor`     | `string`                   | `#E1E9EE`  | Placeholder fill color.                        |
@@ -110,6 +137,7 @@ By default, `Skeleton` renders a rounded rectangle that pulses (fades in and out
 | `spinnerColor`        | `string`                   | `#9FB3C2`  | Color of the spinner-hybrid ring.              |
 | `spinnerSize`         | `number`                   | `0.4`      | Spinner diameter as a fraction of `min(width, height)`, capped at 32px. |
 | `spinnerStrokeWidth`  | `number`                   | `2`        | Stroke width of the spinner ring.              |
+| `customDriver`        | `(progress: SharedValue<number>) => ViewStyle` | —  | Worklet mapping a looping `0→1` progress value to a style, used when `animation="custom"`. |
 | `style`               | `StyleProp<ViewStyle>`     | —          | Additional styles, merged last.                |
 
 `SkeletonColors` and `SkeletonDefaults` are also exported if you want to reuse the library's default theme values in your own components.

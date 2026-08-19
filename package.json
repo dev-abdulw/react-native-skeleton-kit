@@ -1,6 +1,6 @@
 {
   "name": "react-native-skeleton-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Skeleton loading placeholders for React Native and Expo: shimmer, pulse, wave, gradient-cycle, and spinner-hybrid animations with ready-made shapes.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",

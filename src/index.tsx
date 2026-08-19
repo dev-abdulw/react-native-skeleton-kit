@@ -3,5 +3,5 @@ export type {
   SkeletonProps,
   SkeletonAnimation,
   SkeletonCustomDriver,
-} from './Skeleton';
+} from './types';
 export { SkeletonColors, SkeletonDefaults } from './constants';

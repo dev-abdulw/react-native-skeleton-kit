@@ -2,6 +2,11 @@
 
 Skeleton loading placeholders for React Native and Expo: shimmer, pulse, wave, gradient-cycle, and spinner-hybrid animations with ready-made shapes.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dev-abdulw/react-native-skeleton-kit/main/docs/demo/ios-demo.gif" width="280" alt="react-native-skeleton-kit animations demo on iOS" />
+  <img src="https://raw.githubusercontent.com/dev-abdulw/react-native-skeleton-kit/main/docs/demo/android-demo.gif" width="280" alt="react-native-skeleton-kit animations demo on Android" />
+</p>
+
 > **Status:** Phase 1 — the `Skeleton` primitive with `pulse`, `shimmer`, `wave`, `gradient-cycle`, and `spinner-hybrid` animations, plus a custom-driver escape hatch, is available now. Shape presets (text, avatar, card, list item, table, media) are planned next.
 
 ## Requirements
